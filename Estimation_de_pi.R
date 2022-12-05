@@ -189,31 +189,40 @@ print(pts)
 
 
 appartient_poly<-function (point,polygone){
-  intersection<-function(point,polygone){
-    #move x of point and lokk if it intersect with the polygon
-    #if it intersect count it
-    val_max<-max(polygone[,1])
-    val_min<-min(polygone[,1])
-    x<-point[1]
-    while(x<val_max){
-      x<-x+1
-      if(x %in% polygone[,1]){
-        return(TRUE)
-      }
-    }
-    x<-point[1]
-    while(x>val_min){
-      x<-x-1
-        if(x %in% polygone[,1]){
-            return(TRUE)
-        }
-
-    }
-    return(FALSE)
-
+  lineaire<-function (x1,y1,x2,y2){
+    a<-x1-x2
+    b<-y2-y1
+    a<-a/b
+    return(c(a,b))
   }
+  #tout les fonction lineaire de chaque segment
+  l_segment_x<-numeric(nrow(polygone)-1)
+  l_segment_y<-numeric(nrow(polygone)-1)
+  l_segment_z<-numeric(nrow(polygone)-1)
+    for (i in 1:(nrow(polygone)-1)){
+        l_segment_x[i]<-lineaire(polygone[i,1],polygone[i,2],polygone[i+1,1],polygone[i+1,2])[1]
+        l_segment_y[i]<-lineaire(polygone[i,1],polygone[i,2],polygone[i+1,1],polygone[i+1,2])[2]
+
+
+
+    }
+    #on calcule le produit scalaire de chaque segment avec le vecteur point
+    cat('\npoint x\n')
+    cat(l_segment_x)
+    cat('\npoint y\n')
+    cat(l_segment_y)
+
+
+}
+x<-c(0,-2,-1.25,1.25,2)
+y<-c(6,4,2,2,4)
+poly<-creer_polygone(x,y)
+poly
+appartient_poly(c(0,0),poly)
+
+  resultat<-0
   #prendre tous les points du polygone
-  for(i in 1:(nrow(polygone)-1)){
+  for(i in 1:(nrow(polygone)-1)){}
   #pour chaque point on trace une demie droite imaginaires horizontale
 
   #on compte le nombre de fois ou cette demie droite coupe le polygone
@@ -221,7 +230,7 @@ appartient_poly<-function (point,polygone){
   #si le nombre de fois est impair alors le point est à l'intérieur
   #on renvoie le resultat
 
-    return(resultat)
+    return(vecteur)
 
 }
 appartient<-function(points,polynome){
