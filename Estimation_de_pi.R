@@ -189,60 +189,56 @@ print(pts)
 
 
 appartient_poly<-function (point,polygone){
-  lineaire<-function (x1,y1,x2,y2){
-    a<-x1-x2
-    b<-y2-y1
-    a<-a/b
-    return(c(a,b))
-  }
-  #tout les fonction lineaire de chaque segment
-  l_segment_x<-numeric(nrow(polygone)-1)
-  l_segment_y<-numeric(nrow(polygone)-1)
+  # Check if the provided point is inside the polygon (which is a list of the corners of the polygon)
+# The point is inside the polygon if the number of intersections of the ray from the point to the right is odd
+  resultat<-FALSE
+  n<-nrow(polygone)
+    for (i in 1:n) {
+        if (i==n) {
+        j<-1
+        } else {
+        j<-i+1
+        }
+        if (point[2]>min(polygone[i,2],polygone[j,2]) && point[2]<=max(polygone[i,2],polygone[j,2])) {
+          if (point[1]<=max(polygone[i,1],polygone[j,1])) {
+              if (polygone[i,2]!=polygone[j,2]) {
 
-    for (i in 1:(nrow(polygone)-1)){
-        l_segment_x[i]<-lineaire(polygone[i,1],polygone[i,2],polygone[i+1,1],polygone[i+1,2])[1]
-        l_segment_y[i]<-lineaire(polygone[i,1],polygone[i,2],polygone[i+1,1],polygone[i+1,2])[2]
+                # y = ax+b
+                # x = (y-b)/a
+                # x = (y - y1) * (x2 - x1) / (y2 - y1) + x1
+                # on evalue x pour y=point[2]
+                # x = (point[2] - y1) * (x2 - x1) / (y2 - y1) + x1
+                xinters<-((point[2]-polygone[i,2])*(polygone[j,1]-polygone[i,1])/(polygone[j,2]-polygone[i,2])+polygone[i,1])
+                a=(polygone[j,2]-polygone[i,2])/(polygone[j,1]-polygone[i,1])
+                b=polygone[i,2]-a*polygone[i,1]
 
 
-
+                if (polygone[i,1]==polygone[j,1] || point[1]<=xinters) {
+                    resultat<-!resultat
+                }
+              }
+          }
+        }
     }
-    #affiche les fonction lineaire
-  for(i in 1:(nrow(polygone)-1)){
-    cat("f",i,"(x)=",l_segment_x[i],"x+",l_segment_y[i],"\n")
-  }
-
-
+  return  (resultat)
 }
-x<-c(0,-2,-1.25,1.25,2)
-y<-c(6,4,2,2,4)
-poly<-creer_polygone(x,y)
-poly
-appartient_poly(c(0,0),poly)
 
 
-
-
-# le bas est a ignorer
-  resultat<-0
-  #prendre tous les points du polygone
-  for(i in 1:(nrow(polygone)-1)){}
-  #pour chaque point on trace une demie droite imaginaires horizontale
-
-  #on compte le nombre de fois ou cette demie droite coupe le polygone
-  #si le nombre de fois est pair alors le point est à l'extérieur
-  #si le nombre de fois est impair alors le point est à l'intérieur
-  #on renvoie le resultat
-
-    return(vecteur)
-
-}
 appartient<-function(points,polynome){
-  #Définir une matrice de taille n*2, dont la j-ième ligne contient les coordonnées du j-ième sommet du polygone p.
-  n<-nrow(points)
-  appartient<-matrix(0,n,1)
-
-  for (i in 1:n) {
-    appartient[i,1]<-appartient_poly(points[i,],polynome)
+  #qui prend en arguments des points et un polygone, et renvoie pour chaque point TRUE si le point est à l’intérieur du polygone, FALSE sinon.
+  resultat<-rep(FALSE,nrow(points))
+  for (i in 1:nrow(points)) {
+      resultat[i]<-appartient_poly(points[i,],polynome)
   }
-  return(appartient)
+  return(resultat)
 }
+## Réaliser un test de la fonction
+carre <- creer_polygone(c(0, 0, 1, 1), c(0, 1, 1, 0))
+cc <- seq(from=-0.25,to=1.25,by=0.25)
+points <- do.call(rbind,lapply(cc, FUN=cbind, cc,deparse.level = 0))
+pin <- appartient(points,carre);
+## Dessiner le résultat du test
+par(mar=c(2,2,3,2)+0.1)
+plot(carre, type='l', main="Test de la fonction appartient", xlim=range(carre[,1],points[,1]), ylim=range(carre[,2],points[,2]))
+points(points[pin,1], points[pin,2], col='firebrick', pch=20)
+points(points[!pin,1], points[!pin,2], col='darkblue', pch=20)
