@@ -198,7 +198,7 @@ appartient_poly<-function (point,polygone){
   #tout les fonction lineaire de chaque segment
   l_segment_x<-numeric(nrow(polygone)-1)
   l_segment_y<-numeric(nrow(polygone)-1)
-  l_segment_z<-numeric(nrow(polygone)-1)
+
     for (i in 1:(nrow(polygone)-1)){
         l_segment_x[i]<-lineaire(polygone[i,1],polygone[i,2],polygone[i+1,1],polygone[i+1,2])[1]
         l_segment_y[i]<-lineaire(polygone[i,1],polygone[i,2],polygone[i+1,1],polygone[i+1,2])[2]
@@ -206,11 +206,10 @@ appartient_poly<-function (point,polygone){
 
 
     }
-    #on calcule le produit scalaire de chaque segment avec le vecteur point
-    cat('\npoint x\n')
-    cat(l_segment_x)
-    cat('\npoint y\n')
-    cat(l_segment_y)
+    #affiche les fonction lineaire
+  for(i in 1:(nrow(polygone)-1)){
+    cat("f",i,"(x)=",l_segment_x[i],"x+",l_segment_y[i],"\n")
+  }
 
 
 }
@@ -220,6 +219,10 @@ poly<-creer_polygone(x,y)
 poly
 appartient_poly(c(0,0),poly)
 
+
+
+
+# le bas est a ignorer
   resultat<-0
   #prendre tous les points du polygone
   for(i in 1:(nrow(polygone)-1)){}
