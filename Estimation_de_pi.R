@@ -242,3 +242,10 @@ par(mar=c(2,2,3,2)+0.1)
 plot(carre, type='l', main="Test de la fonction appartient", xlim=range(carre[,1],points[,1]), ylim=range(carre[,2],points[,2]))
 points(points[pin,1], points[pin,2], col='firebrick', pch=20)
 points(points[!pin,1], points[!pin,2], col='darkblue', pch=20)
+
+#Définir une fonction mc.poly qui prend en argument un entier n correspondant au nombre de points à tirer au hasard et un polygone, et qui renvoie une valeur approchée de l'aire du ~polygone par la méthode de Monte Carlo.
+mc.poly<-function(n,polygone){}
+
+print(mc.poly(10, losange))
+print(mc.poly(1000, losange))
+print(mc.poly(10000, losange))
