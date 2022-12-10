@@ -85,7 +85,6 @@ papillon <- creer_polygone(c(10,90,10,90), c(30,70,70,30))
 ## pour finir, voici un losange.
 losange <- creer_polygone(c(50,10,50,90),c(30,50,70,50))
 
-print(carre)
 #affiche un plot du carre
 #+BEGIN_SRC R :exports both :file act07/dessin_poly.jpg :width 300 :height 300 :session poly plot(carre, type=’l’) lines(papillon -1, type=’b’, col=’firebrick’) lines(losange, type=’l’, col=’darkblue’) #+END_SRC R
 
@@ -160,15 +159,15 @@ boite<-function(poly){
   return(boite)
 }
 
-print(losange)
+
 bo <- boite(losange)
-print(bo)
+
 
 #Tirage de points uniformément aléatoirement dans un rectangle
 #Définir une fonction points_aleatoires qui prend en argument un couple (n, bo), où n est un entier et bo une boîte rectangulaire, et renvoie une matrice M contenant n points tirés uniformément au hasard dans le rectangle r=[xmin;xmax]*[ymin;ymax]. Plus précisément, la matrice M est de taille n*2 et chaque colonne contient un point tiré uniformément au hasard dans le rectangle r. Par exemple:
 
 points_aleatoires<-function(n, bo){
-  #Définir une matrice de taille n*2, dont la j-ième ligne contient les coordonnées du j-ième sommet du polygone p.
+
   points<-matrix(0,n,2)
 
   for (i in 1:n) {
@@ -179,7 +178,7 @@ points_aleatoires<-function(n, bo){
 }
 bo <- matrix(c(3, 5, 6, 8),nrow=2, dimnames=list(c("min","max"), c("x","y")))
 pts <- points_aleatoires(5, bo)
-print(pts)
+
 
 #5.2 Un point donné est-il à l’intérieur ou à l’extérieur du polygone ?
 
@@ -244,8 +243,26 @@ points(points[pin,1], points[pin,2], col='firebrick', pch=20)
 points(points[!pin,1], points[!pin,2], col='darkblue', pch=20)
 
 #Définir une fonction mc.poly qui prend en argument un entier n correspondant au nombre de points à tirer au hasard et un polygone, et qui renvoie une valeur approchée de l'aire du ~polygone par la méthode de Monte Carlo.
-mc.poly<-function(n,polygone){}
+mc.poly<-function(n,polygone){
+  #faire un caree de taille max des dimensions du polygone
+  bo <- matrix(c(min(polygone[,1]), min(polygone[,2]), max(polygone[,1]), max(polygone[,2])),nrow=2, dimnames=list(c("min","max"), c("x","y")))
+  #affiche les dimentions du polygone
+  print(bo)
+  #calculer l'aire du carrer
+  #produit du max des diff entre les min et max
+  diffx<-abs(bo[2,1]-bo[1,1])
+  diffy<-abs(bo[2,2]-bo[1,2])
+  aire_carre<-diffx*diffy
+  cat("aire du carre",aire_carre,"\n")
+  #tirer n points aleatoires
+  pts <- points_aleatoires(n, bo)
+  #calculer le nombre de points dans le polygone
+  nbpts<-sum(appartient(pts,polygone))
+
+
+
+}
 
 print(mc.poly(10, losange))
-print(mc.poly(1000, losange))
-print(mc.poly(10000, losange))
+#print(mc.poly(1000, losange))
+#print(mc.poly(10000, losange))
