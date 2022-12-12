@@ -1,12 +1,11 @@
 #-------------------------------------------------------------#
 # Description: Estimation de pi par la méthode de Monte Carlo
 #-------------------------------------------------------------#
-
+# Author: Samy Ben Dhiab
 #-------------------------------------------------------------#
 #Parti booléen pour les partie
 
 section_pi<-FALSE
-
 
 #Comment tirer uniformément au hasard n points dans un rectangle ? Indication: utiliser la primitive runif, qui permet de tirer uniformément au hasard un ou plusieurs points dans un intervalle.
 
@@ -38,7 +37,7 @@ testmc.pi<-function(n){
   return(res)
 }
 
-#testmc.pi(8)
+testmc.pi(8)
 
 #Estimations
 #Dans cette section, vous allez définir une matrice PIE de taille t*p (avec t=50 et p=7), contenant des estimations de π. Plus précisément, la coordonnée (i,j) de PIE (avec 1<=i<=t et 1<=j<=p) doit contenir une estimation de π effectuée avec n=10**j points. Ainsi, la j-ième colonne de PIE contient t estimations de π, toutes effectuées avec n=10**j points. Toutes les estimations seront faites de façon indépendante les unes des autres.
@@ -70,7 +69,6 @@ if(section_pi){ t <- 50
 
 
 
-
 ## Definition d'une fonction très utile
 creer_polygone <- function (x,y) {
   matrix(c(x, x[1], y, y[1]), ncol=2,dimnames=list(c(), c("x","y")))
@@ -94,7 +92,7 @@ dessin_polynome<-function(polynome){
     lines(polynome, type="l", col="darkblue")
 }
 
-#dessin_polynome(carre)
+dessin_polynome(carre)
 
 #Définir une fonction reg_poly <- function(n, r=1) { ... } qui prend en argument un entier n, un réel strictement positif r (de valeur 1 par défaut), et qui renvoie un polygone p vérifiant:
 #le polygone p a n côtés,
@@ -120,23 +118,23 @@ reg_poly<-function(n, r=1){
   return(poly)
 }
 
-#dessin_polynome(reg_poly(5, 1))
+dessin_polynome(reg_poly(5, 1))
 
 #4.2 Polygone surprise
 x <- c(0,0,9,11,11,9,8,11,9,6,3,3,8,9,9,8,2,2)
 y <- c(0,12,12,10,7,5,5,0,0,5,5,7,7,8,9,10,10,0)
 surprise <- creer_polygone(x,y)
-#plot(surprise,col="black", type="l")
-
+plot(surprise,col="black", type="l")
 # donne le logo de R
 
 #5 Approximation de l’aire d’un polygone simple
 #5.1 Tirer un ou plusieurs points uniformément au hasard dans un rectangle
 #Définir une fonction boite qui prend en argument un polygone donné sous la forme d’une matrice (comme précédemment) et renvoie une matrice contenant l’abscisse minimale du plus petit rectangle contenant ce polygone, son abscisse maximale, son ordonnée minimale et son ordonnée maximale. Par exemple:
 
-#print(losange)
-#bo <- boite(losange)
-#print(bo)
+print(losange)
+bo <- boite(losange)
+print(bo)
+
 #x  y
 #[1,] 50 30
 #[2,] 10 50
@@ -188,8 +186,10 @@ pts <- points_aleatoires(5, bo)
 
 
 appartient_poly<-function (point,polygone){
-  # Check if the provided point is inside the polygon (which is a list of the corners of the polygon)
-# The point is inside the polygon if the number of intersections of the ray from the point to the right is odd
+
+  # Verifier si le point est à l'intérieur du polygone (qui est une liste des coins du polygone)
+    # On va utiliser la methodes du raytracing
+  # Le point est à l'intérieur du polygone si le nombre d'intersections de la demi-droite partant du point vers la droite est impair
   resultat<-FALSE
   n<-nrow(polygone)
     for (i in 1:n) {
@@ -236,11 +236,12 @@ carre <- creer_polygone(c(0, 0, 1, 1), c(0, 1, 1, 0))
 cc <- seq(from=-0.25,to=1.25,by=0.25)
 points <- do.call(rbind,lapply(cc, FUN=cbind, cc,deparse.level = 0))
 pin <- appartient(points,carre);
+
 ## Dessiner le résultat du test
-#par(mar=c(2,2,3,2)+0.1)
-#plot(carre, type='l', main="Test de la fonction appartient", xlim=range(carre[,1],points[,1]), ylim=range(carre[,2],points[,2]))
-#points(points[pin,1], points[pin,2], col='firebrick', pch=20)
-#points(points[!pin,1], points[!pin,2], col='darkblue', pch=20)
+par(mar=c(2,2,3,2)+0.1)
+plot(carre, type='l', main="Test de la fonction appartient", xlim=range(carre[,1],points[,1]), ylim=range(carre[,2],points[,2]))
+points(points[pin,1], points[pin,2], col='firebrick', pch=20)
+points(points[!pin,1], points[!pin,2], col='darkblue', pch=20)
 
 #fonction qui calcul l'aire d'un polygone
 aire<-function(bo){
@@ -283,10 +284,10 @@ mc.poly<-function(n,polygone,DRAW=FALSE){
 
 }
 
-#print(mc.poly(10, losange))
-#print(mc.poly(1000, losange))
-#print(mc.poly(10000, losange))
-#print(mc.poly(10000, carre))
+print(mc.poly(10, losange))
+print(mc.poly(1000, losange))
+print(mc.poly(10000, losange))
+print(mc.poly(10000, carre))
 
 
 dessin_polynome2<-function(polynome){
@@ -309,15 +310,15 @@ aire.poly<-function(polygone){
 
 }
 
-#print(aire.poly(surprise))#-71
-#print(mc.poly(5000,surprise))
+print(aire.poly(surprise))#-71
+print(mc.poly(5000,surprise))
 
 #Définir un ou plusieurs polygone(s) (par exemple en utilisant la fonction reg_poly), calculer une aire approchée à l’aide de la fonction mc.poly, et l’aire exacte à l’aide de la fonction aire.poly. Comparer les deux valeurs. Faire différentes simulations, en faisant varier le nombre de points utilisés pour approximer l’aire. Représenter vos résultats.
 #Indication: pour la représentation des simulations, vous pourrez vous inspirer de la première partie du TP/projet, sur l’approximation du nombre π.
 #on va tracer des lignes pour comparer le nombre de points selon les figures
 #on va faire varier le nombre de points de 10 à 10000
 #on va faire un polynome de 3 et 10 cotes ainsi que les polygones deja creer
-#on va faire 1000 simulations pour chaque polynome
+#on va faire 5 simulations pour chaque polynome
 
 #on va faire un polynome de 3 cotes
 poly3<-reg_poly(3,1)
