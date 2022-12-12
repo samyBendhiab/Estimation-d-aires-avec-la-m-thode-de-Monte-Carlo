@@ -3,10 +3,6 @@
 #-------------------------------------------------------------#
 # Author: Samy Ben Dhiab
 #-------------------------------------------------------------#
-#Parti booléen pour les partie
-
-section_pi<-FALSE
-
 
 #Comment tirer uniformément au hasard n points dans un rectangle ? Indication: utiliser la primitive runif, qui permet de tirer uniformément au hasard un ou plusieurs points dans un intervalle.
 
