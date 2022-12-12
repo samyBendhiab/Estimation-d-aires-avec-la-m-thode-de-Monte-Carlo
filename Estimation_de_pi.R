@@ -53,7 +53,7 @@ tE <- vector("numeric", p)
 for (j in 1:p) {
   tE[j] <- system.time(replicate(t, mc.pi(10**j)))[3]
 }
-
+tE
 
 #Erreur relative
 #Quelle est la formule pour l’erreur relative entre une valeur et son estimation ? Définir une matrice ERR de taille t*p dont la coordonnée (i,j) est l’erreur relative entre π et son estimation PIE[i,j].
@@ -130,6 +130,17 @@ plot(surprise,col="black", type="l")
 #5.1 Tirer un ou plusieurs points uniformément au hasard dans un rectangle
 #Définir une fonction boite qui prend en argument un polygone donné sous la forme d’une matrice (comme précédemment) et renvoie une matrice contenant l’abscisse minimale du plus petit rectangle contenant ce polygone, son abscisse maximale, son ordonnée minimale et son ordonnée maximale. Par exemple:
 
+boite<-function(poly){
+  #Définir une matrice de taille 2*2, dont la j-ième ligne contient les coordonnées du j-ième sommet du polygone p.
+  boite<-matrix(0,2,2)
+
+  boite[1,1]<-min(poly[,1])
+  boite[1,2]<-min(poly[,2])
+  boite[2,1]<-max(poly[,1])
+  boite[2,2]<-max(poly[,2])
+  return(boite)
+}
+
 print(losange)
 bo <- boite(losange)
 print(bo)
@@ -145,19 +156,8 @@ print(bo)
 #max 90 70
 
 
-boite<-function(poly){
-  #Définir une matrice de taille 2*2, dont la j-ième ligne contient les coordonnées du j-ième sommet du polygone p.
-    boite<-matrix(0,2,2)
-
-    boite[1,1]<-min(poly[,1])
-    boite[1,2]<-min(poly[,2])
-    boite[2,1]<-max(poly[,1])
-    boite[2,2]<-max(poly[,2])
-  return(boite)
-}
 
 
-#bo <- boite(losange)
 
 
 #Tirage de points uniformément aléatoirement dans un rectangle
@@ -242,6 +242,7 @@ plot(carre, type='l', main="Test de la fonction appartient", xlim=range(carre[,1
 points(points[pin,1], points[pin,2], col='firebrick', pch=20)
 points(points[!pin,1], points[!pin,2], col='darkblue', pch=20)
 
+
 #fonction qui calcul l'aire d'un polygone
 aire<-function(bo){
   diffx<-bo[2,1]-bo[1,1]
@@ -284,9 +285,9 @@ mc.poly<-function(n,polygone,DRAW=FALSE){
 }
 
 print(mc.poly(10, losange))
-print(mc.poly(1000, losange))
-print(mc.poly(10000, losange))
-print(mc.poly(10000, carre))
+print(mc.poly(1000, losange),TRUE)
+print(mc.poly(10000, losange),TRUE)
+print(mc.poly(10000, carre),TRUE)
 
 
 dessin_polynome2<-function(polynome){
@@ -369,6 +370,9 @@ lines(10^seq(1,n),erreurcarre,type="l",col="darkorange")
 par(new=TRUE)
 lines(10^seq(1,n),erreursurprise,type="l",col="darkviolet")
 par(new=TRUE)
+
+boxplot(erreur3,erreur10,erreurlosange,erreurcarre,erreursurprise,main="Erreur en fonction du nombre de points",names=c("polygone a 3 cote","polygone a 10 cote","losange","carre","surprise"),col=c("darkblue","firebrick","darkgreen","darkorange","darkviolet"))
+
 
 
 #on voit que plus le nombre de points est grand plus l'erreur est petite
