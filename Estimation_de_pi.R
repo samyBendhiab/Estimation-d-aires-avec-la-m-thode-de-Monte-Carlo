@@ -49,19 +49,21 @@ for (i in 1:t) {
 #Dans cette section, vous allez définir un vecteur tE de taille p contenant le temps moyen mis pour obtenir de telles estimations. Plus précisément, la j-ième coordonnée du vecteur tE (avec 1<=j<=p) doit contenir le temps moyen mis pour effectuer une estimation de π, chacune de ces estimations étant effectuée avec n=10**j points.
 #Indication: utiliser la primitive system.time, qui renvoie le temps mis pour évaluer un expression donnée et la primitive replicate qui répète l’évaluation d’une expression.
 
-tE <- system.time(replicate(p, mc.pi(10**j)))
-tE
+tE <- vector("numeric", p)
+for (j in 1:p) {
+  tE[j] <- system.time(replicate(t, mc.pi(10**j)))[3]
+}
 
 
 #Erreur relative
 #Quelle est la formule pour l’erreur relative entre une valeur et son estimation ? Définir une matrice ERR de taille t*p dont la coordonnée (i,j) est l’erreur relative entre π et son estimation PIE[i,j].
 
 #la valeur absolue
-ERR <- abs(PIE / pi - 1)
-
-par(mfrow = c(1, 2), mar = c(4, 4, 2, 2) + 0.1)
-boxplot(ERR, main = 'Erreur relative sur PI', log = 'y', xlab = '#points', ylab = 'Rel. Error')
-plot(10^(1:p), tE, type = 'b', main = 'Temps moyen d\'une simulation', log = 'x', xlab = '#points', ylab = 'Time')
+ERR <- abs(PIE/pi - 1)
+cat(length(ERR), "\t", length(PIE), "\t", length(pi), "\t", length(PIE / pi - 1),"\n")
+par(mfrow=c(1,2),mar=c(4,4,2,2)+0.1)
+boxplot(ERR, main='Erreur relative sur PI', log='y', xlab='#points', ylab='Rel. Error')
+plot(10 ** seq(1:p), tE, type='b', main='Temps moyen d\'une simulation', log='x', xlab='#points', ylab='Time')
 
 
 
