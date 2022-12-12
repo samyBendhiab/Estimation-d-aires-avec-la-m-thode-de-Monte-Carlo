@@ -89,12 +89,12 @@ losange <- creer_polygone(c(50,10,50,90),c(30,50,70,50))
 #+BEGIN_SRC R :exports both :file act07/dessin_poly.jpg :width 300 :height 300 :session poly plot(carre, type=’l’) lines(papillon -1, type=’b’, col=’firebrick’) lines(losange, type=’l’, col=’darkblue’) #+END_SRC R
 
 dessin_polynome<-function(polynome){
+
     plot(polynome, type="l")
-    lines(polynome -1, type="b", col="firebrick")
     lines(polynome, type="l", col="darkblue")
 }
 
-dessin_polynome(carre)
+#dessin_polynome(carre)
 
 #Définir une fonction reg_poly <- function(n, r=1) { ... } qui prend en argument un entier n, un réel strictement positif r (de valeur 1 par défaut), et qui renvoie un polygone p vérifiant:
 #le polygone p a n côtés,
@@ -120,13 +120,13 @@ reg_poly<-function(n, r=1){
   return(poly)
 }
 
-dessin_polynome(reg_poly(5, 1))
+#dessin_polynome(reg_poly(5, 1))
 
 #4.2 Polygone surprise
 x <- c(0,0,9,11,11,9,8,11,9,6,3,3,8,9,9,8,2,2)
 y <- c(0,12,12,10,7,5,5,0,0,5,5,7,7,8,9,10,10,0)
 surprise <- creer_polygone(x,y)
-plot(surprise,col="black", type="l")
+#plot(surprise,col="black", type="l")
 
 # donne le logo de R
 
@@ -160,7 +160,7 @@ boite<-function(poly){
 }
 
 
-bo <- boite(losange)
+#bo <- boite(losange)
 
 
 #Tirage de points uniformément aléatoirement dans un rectangle
@@ -237,32 +237,142 @@ cc <- seq(from=-0.25,to=1.25,by=0.25)
 points <- do.call(rbind,lapply(cc, FUN=cbind, cc,deparse.level = 0))
 pin <- appartient(points,carre);
 ## Dessiner le résultat du test
-par(mar=c(2,2,3,2)+0.1)
-plot(carre, type='l', main="Test de la fonction appartient", xlim=range(carre[,1],points[,1]), ylim=range(carre[,2],points[,2]))
-points(points[pin,1], points[pin,2], col='firebrick', pch=20)
-points(points[!pin,1], points[!pin,2], col='darkblue', pch=20)
+#par(mar=c(2,2,3,2)+0.1)
+#plot(carre, type='l', main="Test de la fonction appartient", xlim=range(carre[,1],points[,1]), ylim=range(carre[,2],points[,2]))
+#points(points[pin,1], points[pin,2], col='firebrick', pch=20)
+#points(points[!pin,1], points[!pin,2], col='darkblue', pch=20)
 
+#fonction qui calcul l'aire d'un polygone
+aire<-function(bo){
+  diffx<-bo[2,1]-bo[1,1]
+  diffy<-bo[2,2]-bo[1,2]
+  aire<-diffx*diffy
+  return(abs(aire))
+}
+
+dessin_points<-function(points,pin){
+  #dessiner les points
+  #si le point est in le point est rouge
+  if (pin) { points(points[,1], points[,2], col='firebrick', pch=20)
+  }
+  #sinon le point est bleu
+  else { points(points[,1], points[,2], col='darkblue', pch=20)}
+
+}
 #Définir une fonction mc.poly qui prend en argument un entier n correspondant au nombre de points à tirer au hasard et un polygone, et qui renvoie une valeur approchée de l'aire du ~polygone par la méthode de Monte Carlo.
-mc.poly<-function(n,polygone){
-  #faire un caree de taille max des dimensions du polygone
-  bo <- matrix(c(min(polygone[,1]), min(polygone[,2]), max(polygone[,1]), max(polygone[,2])),nrow=2, dimnames=list(c("min","max"), c("x","y")))
-  #affiche les dimentions du polygone
-  print(bo)
-  #calculer l'aire du carrer
-  #produit du max des diff entre les min et max
-  diffx<-abs(bo[2,1]-bo[1,1])
-  diffy<-abs(bo[2,2]-bo[1,2])
-  aire_carre<-diffx*diffy
-  cat("aire du carre",aire_carre,"\n")
+mc.poly<-function(n,polygone,DRAW=FALSE){
+  #faire un carre de taille max des dimensions du polygone
+  bo<-boite(polygone)
   #tirer n points aleatoires
   pts <- points_aleatoires(n, bo)
   #calculer le nombre de points dans le polygone
   nbpts<-sum(appartient(pts,polygone))
+  #portion de points dans le polygone
+  p<-nbpts/n
+  if(DRAW){
+    #dessine le polygone et les points
+    dessin_polynome(polygone)
+    #points dans le polygone
+    dessin_points(pts[appartient(pts,polygone),],TRUE)
+    #points hors du polygone
+    dessin_points(pts[!appartient(pts,polygone),],FALSE)
+  }
 
+  return(p*aire(bo))
 
 
 }
 
-print(mc.poly(10, losange))
+#print(mc.poly(10, losange))
 #print(mc.poly(1000, losange))
 #print(mc.poly(10000, losange))
+#print(mc.poly(10000, carre))
+
+
+dessin_polynome2<-function(polynome){
+  plot(polynome, type="l")
+  par(new=TRUE)
+  lines(polynome, type="l", col="darkblue")
+}
+#Définir une fonction aire.poly qui prend en argument un polygone et calcule son aire exacte.
+aire.poly<-function(polygone){
+    #calculer l'aire du polygone avec la somme des triangles
+    aire<-0
+    for (i in 1:(nrow(polygone)-1)) {
+      aire<-aire+(polygone[i+1,1]+polygone[i,1])*(polygone[i+1,2]-polygone[i,2])
+    }
+
+
+
+  aire<-abs(aire/2)
+  return(aire)
+
+}
+
+#print(aire.poly(surprise))#-71
+#print(mc.poly(5000,surprise))
+
+#Définir un ou plusieurs polygone(s) (par exemple en utilisant la fonction reg_poly), calculer une aire approchée à l’aide de la fonction mc.poly, et l’aire exacte à l’aide de la fonction aire.poly. Comparer les deux valeurs. Faire différentes simulations, en faisant varier le nombre de points utilisés pour approximer l’aire. Représenter vos résultats.
+#Indication: pour la représentation des simulations, vous pourrez vous inspirer de la première partie du TP/projet, sur l’approximation du nombre π.
+#on va tracer des lignes pour comparer le nombre de points selon les figures
+#on va faire varier le nombre de points de 10 à 10000
+#on va faire un polynome de 3 et 10 cotes ainsi que les polygones deja creer
+#on va faire 1000 simulations pour chaque polynome
+
+#on va faire un polynome de 3 cotes
+poly3<-reg_poly(3,1)
+#on va faire un polynome de 10 cotes
+poly10<-reg_poly(10,1)
+
+#calcul des aires exactes
+aire3<-aire.poly(poly3)
+aire10<-aire.poly(poly10)
+airelosange<-aire.poly(losange)
+airecarre<-aire.poly(carre)
+airesurprise<-aire.poly(surprise)
+
+#calcul des aires approchees en fonction du nombre de points
+n<-5 #10 puissance cmb de points
+nrep<-5 #nombre de simulation
+aire3mc<-numeric(n)
+aire10mc<-numeric(n)
+airelosangemc<-numeric(n)
+airecarremc<-numeric(n)
+airesurprisemc<-numeric(n)
+
+for (i in 1:n){
+  aire3mc[i]<-mean(replicate(nrep,mc.poly(10^i,poly3)))
+  aire10mc[i]<-mean(replicate(nrep,mc.poly(10^i,poly10)))
+  airelosangemc[i]<-mean(replicate(nrep,mc.poly(10^i,losange)))
+  airecarremc[i]<-mean(replicate(nrep,mc.poly(10^i,carre)))
+  airesurprisemc[i]<-mean(replicate(nrep,mc.poly(10^i,surprise)))
+
+}
+
+#calcul des erreurs
+erreur3<-abs(aire3-aire3mc)
+erreur10<-abs(aire10-aire10mc)
+erreurlosange<-abs(airelosange-airelosangemc)
+erreurcarre<-abs(airecarre-airecarremc)
+erreursurprise<-abs(airesurprise-airesurprisemc)
+
+
+#on va tracer les courbes
+plot(10^seq(1,n),erreur3,type="l",col="darkblue",xlab="Nombre de points",ylab="Erreur",main="Erreur en fonction du nombre de points")
+legend("top",legend=c("polygone a 3 cote","polygone a 10 cote","losange","carre","surprise"),col=c("darkblue","firebrick","darkgreen","darkorange","darkviolet"),lty=1)
+par(new=TRUE)
+lines(10^seq(1,n),erreur10,type="l",col="firebrick")
+par(new=TRUE)
+lines(10^seq(1,n),erreurlosange,type="l",col="darkgreen")
+par(new=TRUE)
+lines(10^seq(1,n),erreurcarre,type="l",col="darkorange")
+par(new=TRUE)
+lines(10^seq(1,n),erreursurprise,type="l",col="darkviolet")
+par(new=TRUE)
+
+
+#on voit que plus le nombre de points est grand plus l'erreur est petite
+#on voit que pour le polygone a 3 cote l'erreur est plus grande que pour le polygone a 10 cote
+#on voit que pour le polygone a 3 cote l'erreur est plus grande que pour le losange
+#on voit que pour le polygone a 3 cote l'erreur est plus grande que pour le carre
+#on voit que pour le polygone a 3 cote l'erreur est plus grande que pour le surprise
