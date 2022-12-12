@@ -7,6 +7,7 @@
 
 section_pi<-FALSE
 
+
 #Comment tirer uniformément au hasard n points dans un rectangle ? Indication: utiliser la primitive runif, qui permet de tirer uniformément au hasard un ou plusieurs points dans un intervalle.
 
 #runif(n, min = 0, max = 1)
@@ -41,30 +42,30 @@ testmc.pi(8)
 
 #Estimations
 #Dans cette section, vous allez définir une matrice PIE de taille t*p (avec t=50 et p=7), contenant des estimations de π. Plus précisément, la coordonnée (i,j) de PIE (avec 1<=i<=t et 1<=j<=p) doit contenir une estimation de π effectuée avec n=10**j points. Ainsi, la j-ième colonne de PIE contient t estimations de π, toutes effectuées avec n=10**j points. Toutes les estimations seront faites de façon indépendante les unes des autres.
-if(section_pi){ t <- 50
-  p <- 7
-  PIE <- matrix(0, t, p)
-  for (i in 1:t) {
-    for (j in 1:p) {
-      PIE[i, j] <- mc.pi(10**j)
-    }
+t <- 50
+p <- 7
+PIE <- matrix(0, t, p)
+for (i in 1:t) {
+  for (j in 1:p) {
+    PIE[i, j] <- mc.pi(10**j)
   }
-  #Dans cette section, vous allez définir un vecteur tE de taille p contenant le temps moyen mis pour obtenir de telles estimations. Plus précisément, la j-ième coordonnée du vecteur tE (avec 1<=j<=p) doit contenir le temps moyen mis pour effectuer une estimation de π, chacune de ces estimations étant effectuée avec n=10**j points.
-  #Indication: utiliser la primitive system.time, qui renvoie le temps mis pour évaluer un expression donnée et la primitive replicate qui répète l’évaluation d’une expression.
+}
+#Dans cette section, vous allez définir un vecteur tE de taille p contenant le temps moyen mis pour obtenir de telles estimations. Plus précisément, la j-ième coordonnée du vecteur tE (avec 1<=j<=p) doit contenir le temps moyen mis pour effectuer une estimation de π, chacune de ces estimations étant effectuée avec n=10**j points.
+#Indication: utiliser la primitive system.time, qui renvoie le temps mis pour évaluer un expression donnée et la primitive replicate qui répète l’évaluation d’une expression.
 
-  tE <- system.time(replicate(p, mc.pi(10**j)))
-  tE
+tE <- system.time(replicate(p, mc.pi(10**j)))
+tE
 
 
-  #Erreur relative
-  #Quelle est la formule pour l’erreur relative entre une valeur et son estimation ? Définir une matrice ERR de taille t*p dont la coordonnée (i,j) est l’erreur relative entre π et son estimation PIE[i,j].
+#Erreur relative
+#Quelle est la formule pour l’erreur relative entre une valeur et son estimation ? Définir une matrice ERR de taille t*p dont la coordonnée (i,j) est l’erreur relative entre π et son estimation PIE[i,j].
 
-  #la valeur absolue
-  ERR <- abs(PIE / pi - 1)
+#la valeur absolue
+ERR <- abs(PIE / pi - 1)
 
-  par(mfrow = c(1, 2), mar = c(4, 4, 2, 2) + 0.1)
-  boxplot(ERR, main = 'Erreur relative sur PI', log = 'y', xlab = '#points', ylab = 'Rel. Error')
-  plot(10^(1:p), tE, type = 'b', main = 'Temps moyen d\'une simulation', log = 'x', xlab = '#points', ylab = 'Time') }
+par(mfrow = c(1, 2), mar = c(4, 4, 2, 2) + 0.1)
+boxplot(ERR, main = 'Erreur relative sur PI', log = 'y', xlab = '#points', ylab = 'Rel. Error')
+plot(10^(1:p), tE, type = 'b', main = 'Temps moyen d\'une simulation', log = 'x', xlab = '#points', ylab = 'Time')
 
 
 
