@@ -202,7 +202,6 @@ dessin_polynome(papillon)
 dessin_polynome(losange)
 ```
 
-
 # 4 Génération de polygones
 
 ### Tout d'abord on se demande Quelles sont les coordonnées cartésiennes (x,y) d'un point dont les coordonnées polaires sont (r,theta)?
@@ -240,7 +239,6 @@ for (i in 5:10) {
   dessin_polynome(reg_poly(i))
 }
 ```
-
 
 ## 4.2 Polygone surprise
 
@@ -290,7 +288,9 @@ losange: x y [1,] 50 30 [2,] 10 50 [3,] 50 70 [4,] 90 50 [5,] 50 30
 
 boite(losange) x y min 10 30 max 90 70
 
-##Tirage de points uniformément aléatoirement dans un rectangle \### fonction qui renvoi n tuple de points dans notre boite
+## Tirage de points uniformément aléatoirement dans un rectangle
+
+### fonction qui renvoi n tuple de points dans notre boite
 
 ```{r include=FALSE}
 points_aleatoires<-function(n, bo){
@@ -453,7 +453,7 @@ mc.poly<-function(n,polygone,DRAW=FALSE){
 
 ```{r echo=FALSE}
 par(mfrow=c(2,2))
-cat("approximation de l'aire du polygone par la methode de Monte Carlo")
+cat("Approximation de l'aire du polygone par la methode de Monte Carlo")
 cat("Aire du losange avec 10 points",mc.poly(10,losange,TRUE))
 cat("Aire du losange avec 100 points",mc.poly(100,losange,TRUE))
 cat("Aire du losange avec 1000 points",mc.poly(1000,losange,TRUE))
@@ -462,19 +462,21 @@ cat("Aire du losange avec 10000 points",mc.poly(10000,losange,TRUE))
 
 ### Test avec affichage d'un polygone non regulier
 
-```{r echo=FALSE}
+```{r echo=FALSE,fig.width=4}
 print(mc.poly(10000, surprise,TRUE))
 ```
 
 # 6 Calcul exact de l'aire d'un polygone simple
 
-l'aire du losange et du carré est de 1 c'est ce que j'ai obtenu a la main , le resultat est satisfaisant
+L'aire du losange et du carré est de 1 c'est ce que j'ai obtenu a la main , le resultat est satisfaisant
 
-Aire exacte d'un polygone simple
+#### Aire exacte d'un polygone simple
 
-J'ai calculer l'aire du polygone avec la somme des triangles
+Puisque que l'on n'a pas de formules pour calculer l'aire mais que l'on sait que la somme de l'aire des sous figures nous donne l'aire de la figure on peut utiliser la formule de la somme des triangles ci dessous.
 
-```{r echo=FALSE}
+![](assets/formule_air.png){width="688"}
+
+```{r include=FALSE}
 aire.poly<-function(polygone){
     
     aire<-0
@@ -519,12 +521,14 @@ aire10<-aire.poly(poly10)
 airelosange<-aire.poly(losange)
 airecarre<-aire.poly(carre)
 airesurprise<-aire.poly(surprise)
-
 ```
 
 ```{r include=FALSE}
-n<-5 #10 puissance cmb de points
-nrep<-5 #nombre de simulation
+nf<-5 #10^n = plus grand nombre de points teste
+nd<-3 #10^nd = plus petit nombre de points teste
+echelle<-seq(nd,nf)
+n<-length(echelle) #10 puissance cmb de points
+nrep<-7 #nombre de simulation
 aire3mc<-numeric(n)
 aire10mc<-numeric(n)
 airelosangemc<-numeric(n)
@@ -532,12 +536,11 @@ airecarremc<-numeric(n)
 airesurprisemc<-numeric(n)
 
 for (i in 1:n){
-  aire3mc[i]<-mean(replicate(nrep,mc.poly(10^i,poly3)))
-  aire10mc[i]<-mean(replicate(nrep,mc.poly(10^i,poly10)))
-  airelosangemc[i]<-mean(replicate(nrep,mc.poly(10^i,losange)))
-  airecarremc[i]<-mean(replicate(nrep,mc.poly(10^i,carre)))
-  airesurprisemc[i]<-mean(replicate(nrep,mc.poly(10^i,surprise)))
-
+  aire3mc[i]<-mean(replicate(nrep,mc.poly(10**echelle[i],poly3)))
+  aire10mc[i]<-mean(replicate(nrep,mc.poly(10**echelle[i],poly10)))
+  airelosangemc[i]<-mean(replicate(nrep,mc.poly(10**echelle[i],losange)))
+  airecarremc[i]<-mean(replicate(nrep,mc.poly(10**echelle[i],carre)))
+  airesurprisemc[i]<-mean(replicate(nrep,mc.poly(10**echelle[i],surprise)))
 }
 ```
 
@@ -552,16 +555,18 @@ erreursurprise<-abs(airesurprise-airesurprisemc)
 
 ```{r echo=FALSE}
 
-plot(10^seq(1,n),erreur3,type="l",col="darkblue",xlab="Nombre de points",ylab="Erreur",main="Erreur en fonction du nombre de points")
-legend("top",legend=c("polygone a 3 cote","polygone a 10 cote","losange","carre","surprise"),col=c("darkblue","firebrick","darkgreen","darkorange","darkviolet"),lty=1)
-par(new=TRUE)
-lines(10^seq(1,n),erreur10,type="l",col="firebrick")
-par(new=TRUE)
-lines(10^seq(1,n),erreurlosange,type="l",col="darkgreen")
-par(new=TRUE)
-lines(10^seq(1,n),erreurcarre,type="l",col="darkorange")
-par(new=TRUE)
-lines(10^seq(1,n),erreursurprise,type="l",col="darkviolet")
+plot(10^echelle,erreur3,type="l",col="darkblue",xlab="Nombre de points",ylab="Erreur",main="Erreur en fonction du nombre de points",log="x",ylim = c(0,5))
+
+lines(10^echelle,erreur10,type="l",col="firebrick")
+
+lines(10^echelle,erreurlosange,type="l",col="darkgreen")
+
+lines(10^echelle,erreurcarre,type="l",col="darkorange")
+
+lines(10^echelle,erreursurprise,type="l",col="darkviolet")
+
+legend("topleft",legend=c("polygone a 3 cote","polygone a 10 cote","losange","carre","surprise"),col=c("darkblue","firebrick","darkgreen","darkorange","darkviolet"),lty=1)
+
 ```
 
 -   on voit que plus le nombre de points est grand plus l'erreur est petite
@@ -574,8 +579,8 @@ lines(10^seq(1,n),erreursurprise,type="l",col="darkviolet")
 
 -   on voit que pour le polygone a 3 côtés l'erreur est plus grande que pour le surprise
 
--   on voit que pour le carre et le lonsange l'erreur reste constante
+-   on voit que pour le carre et le lonsange l'erreur reste nul
 
 # Conclusion:
 
-on voit que plus le nombre de points est grand plus l'erreur est petite
+On voit que plus le nombre de points est grand plus l'erreur est petite

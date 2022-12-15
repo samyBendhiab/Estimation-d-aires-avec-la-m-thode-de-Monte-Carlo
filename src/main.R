@@ -124,8 +124,8 @@ reg_poly<-function(n, r=1){
   poly[n+1,2]<-r*sin(angle*1)
 
   #Quelles sont les coordonnées cartésiennes (x,y) d’un point dont les coordonnées polaires sont (r,theta)?
-    #x=r*cos(theta)
-    #y=r*sin(theta)
+  #x=r*cos(theta)
+  #y=r*sin(theta)
 
   return(poly)
 }
@@ -343,21 +343,25 @@ airecarre<-aire.poly(carre)
 airesurprise<-aire.poly(surprise)
 
 #calcul des aires approchees en fonction du nombre de points
-n<-5 #10 puissance cmb de points
-nrep<-5 #nombre de simulation
+nf<-5#10^n = plus grand nombre de points teste
+nd<-3 #10^nd = plus petit nombre de points teste
+echelle<-seq(nd,nf)
+n<-length(echelle) #10 puissance cmb de points
+nrep<-7 #nombre de simulation
 aire3mc<-numeric(n)
 aire10mc<-numeric(n)
 airelosangemc<-numeric(n)
 airecarremc<-numeric(n)
 airesurprisemc<-numeric(n)
 
-for (i in 1:n){
-  aire3mc[i]<-mean(replicate(nrep,mc.poly(10^i,poly3)))
-  aire10mc[i]<-mean(replicate(nrep,mc.poly(10^i,poly10)))
-  airelosangemc[i]<-mean(replicate(nrep,mc.poly(10^i,losange)))
-  airecarremc[i]<-mean(replicate(nrep,mc.poly(10^i,carre)))
-  airesurprisemc[i]<-mean(replicate(nrep,mc.poly(10^i,surprise)))
 
+
+for (i in 1:n){
+  aire3mc[i]<-mean(replicate(nrep,mc.poly(10**echelle[i],poly3)))
+    aire10mc[i]<-mean(replicate(nrep,mc.poly(10**echelle[i],poly10)))
+    airelosangemc[i]<-mean(replicate(nrep,mc.poly(10**echelle[i],losange)))
+    airecarremc[i]<-mean(replicate(nrep,mc.poly(10**echelle[i],carre)))
+    airesurprisemc[i]<-mean(replicate(nrep,mc.poly(10**echelle[i],surprise)))
 }
 
 #calcul des erreurs
@@ -367,16 +371,19 @@ erreurlosange<-abs(airelosange-airelosangemc)
 erreurcarre<-abs(airecarre-airecarremc)
 erreursurprise<-abs(airesurprise-airesurprisemc)
 
-
 #on va tracer les courbes
 
 par(new=TRUE)
-plot(10^seq(1,n),erreur3,type="l",col="darkblue",xlab="Nombre de points",ylab="Erreur",main="Erreur en fonction du nombre de points")
+plot(10^echelle,erreur3,type="l",col="darkblue",xlab="Nombre de points",ylab="Erreur",main="Erreur en fonction du nombre de points",log="xy")
 legend("top",legend=c("polygone a 3 cote","polygone a 10 cote","losange","carre","surprise"),col=c("darkblue","firebrick","darkgreen","darkorange","darkviolet"),lty=1)
-lines(10^seq(1,n),erreur10,type="l",col="firebrick")
-lines(10^seq(1,n),erreurlosange,type="l",col="darkgreen")
-lines(10^seq(1,n),erreurcarre,type="l",col="darkorange")
-lines(10^seq(1,n),erreursurprise,type="l",col="darkviolet")
+par(new=TRUE)
+lines(10^echelle,erreur10,type="l",col="firebrick")
+par(new=TRUE)
+lines(10^echelle,erreurlosange,type="l",col="darkgreen")
+par(new=TRUE)
+lines(10^echelle,erreurcarre,type="l",col="darkorange")
+par(new=TRUE)
+lines(10^echelle,erreursurprise,type="l",col="darkviolet")
 
 #on voit que plus le nombre de points est grand plus l'erreur est petite
 #on voit que pour le polygone a 3 cote l'erreur est plus grande que pour le polygone a 10 cote
