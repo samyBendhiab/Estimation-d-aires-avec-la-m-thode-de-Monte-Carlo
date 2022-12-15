@@ -97,11 +97,14 @@ losange <- creer_polygone(c(50,10,50,90),c(30,50,70,50))
 #+BEGIN_SRC R :exports both :file act07/dessin_poly.jpg :width 300 :height 300 :session poly plot(carre, type=’l’) lines(papillon -1, type=’b’, col=’firebrick’) lines(losange, type=’l’, col=’darkblue’) #+END_SRC R
 dessin_polynome<-function(polynome){
 
-  plot(polynome, type="l")
+  plot(polynome, type='l')
   lines(polynome, type="l", col="darkblue")
 }
-
 dessin_polynome(carre)
+
+
+
+
 
 #Définir une fonction reg_poly <- function(n, r=1) { ... } qui prend en argument un entier n, un réel strictement positif r (de valeur 1 par défaut), et qui renvoie un polygone p vérifiant:
 #le polygone p a n côtés,
@@ -126,10 +129,11 @@ reg_poly<-function(n, r=1){
 
   return(poly)
 }
-#dessin 2 polygones cote a cote
-par(mfrow=c(1,2),mar=c(4,4,2,2)+0.1)
-dessin_polynome(reg_poly(5, 1))
-dessin_polynome(reg_poly(10, 1))
+#dessin des polynomes de 5 à 10 côtés
+par(mfrow=c(2,3),mar=c(4,4,2,2)+0.1)
+for (i in 5:10) {
+  dessin_polynome(reg_poly(i))
+}
 
 #4.2 Polygone surprise
 x <- c(0,0,9,11,11,9,8,11,9,6,3,3,8,9,9,8,2,2)
@@ -311,7 +315,7 @@ cat("Aire du losange avec 10000 points",mc.poly(10000,losange,TRUE),"\n")
 ## l'aire du losange et du carré est de 1 c'est ce que j'ai obtenu a la main , le resultat est satisfaisant
 
 # Test avec affichage de surprises car le polygone n'est regulier
-
+print(mc.poly(10000, surprise,TRUE))
 
 #Définir une fonction aire.poly qui prend en argument un polygone et calcule son aire exacte.
 aire.poly<-function(polygone){

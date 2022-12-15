@@ -1,5 +1,5 @@
 ---
-title: "Estimation-d-aires-avec-la-methode-de-Monte-Carlo"
+title: "Estimation d'aire avec la méthode de Monte-Carlo"
 author: "Samy Ben Dhiab"
 date: "2022-12-12"
 output:
@@ -10,6 +10,8 @@ header-includes:
   - \predate{\begin{center}\large}
   - \postdate{\\
       \includegraphics[width=2in,height=2in]{assets/logo.png}\end{center}}
+editor_options: 
+  chunk_output_type: console
 ---
 
 \newpage
@@ -73,7 +75,7 @@ ERR <- abs(PIE / pi - 1)
 
 ### Representation du temps moyen et de l'erreur relative en fonction des 10\^n points
 
-```{r echo=FALSE}
+```{r echo=FALSE,fig.width=6,fig.height=3}
 par(mfrow = c(1, 2), mar = c(4, 4, 2, 2) + 0.1)
 boxplot(ERR, main = 'Erreur relative sur PI', log = 'y', xlab = '#points', ylab = 'Rel. Error')
 plot(10^(1:p), tE, type = 'b', main = 'Temps moyen d\'une simulation', log = 'x', xlab = '#points', ylab = 'Time')
@@ -81,7 +83,7 @@ plot(10^(1:p), tE, type = 'b', main = 'Temps moyen d\'une simulation', log = 'x'
 
 ## 2.3 Autres méthodes d'estimation de Pi
 
-### Cette fonction calcul pi grâce au calcul en serie
+#### Cette fonction calcul pi grâce au calcul en serie
 
 ```{r}
 serie <- function(x){
@@ -93,7 +95,7 @@ serie <- function(x){
 }
 ```
 
-### Cette fonction calcul pi grâce au procédé somme infinie
+#### Cette fonction calcul pi grâce au procédé somme infinie
 
 ```{r}
 somme_inf <- function(x){
@@ -105,7 +107,7 @@ somme_inf <- function(x){
 }
 ```
 
-### Cette fonction calcul pi grâce à une méthode récursive
+#### Cette fonction calcul pi grâce à une méthode récursive
 
 ```{r}
 math <- function(n){
@@ -124,7 +126,7 @@ math <- function(n){
 }
 ```
 
-### Cette fonction calcul pi grâce à une méthode datant du moyen-âge
+#### Cette fonction calcul pi grâce à une méthode datant du moyen-âge
 
 ```{r}
 histo <- function(n){
@@ -140,11 +142,11 @@ histo <- function(n){
 
 # Conclusion
 
-### Quelle est la relation entre l'erreur relative et le temps mis pour obtenir une estimation ?
+#### Quelle est la relation entre l'erreur relative et le temps mis pour obtenir une estimation ?
 
 La relation est linéaire, plus le nombre de points est grand, plus le temps de calcul est long et plus l'erreur est petite.
 
-### Quelle est la relation entre l'erreur relative et le nombre de points utilisés pour obtenir une estimation ?
+#### Quelle est la relation entre l'erreur relative et le nombre de points utilisés pour obtenir une estimation ?
 
 Plus le nombre de points est grand, plus l'erreur est petite.
 
@@ -182,19 +184,24 @@ losange <- creer_polygone(c(50,10,50,90),c(30,50,70,50))
 
 ```
 
-affiche un plot du carre
+Affichage des figures
 
-```{r echo=FALSE}
+```{r echo=FALSE,fig.height=6,fig.width=6}
 
 
 dessin_polynome<-function(polynome){
 
-    plot(polynome, type="l")
-    lines(polynome, type="l", col="darkblue")
+  plot(polynome, type='l')
+  lines(polynome, type="l", col="darkblue")
 }
 
+
+par(mfrow=c(2,2),mar=c(4,4,2,2)+0.1)
 dessin_polynome(carre)
+dessin_polynome(papillon)
+dessin_polynome(losange)
 ```
+
 
 # 4 Génération de polygones
 
@@ -204,7 +211,7 @@ x=r*cos(theta) y=r*sin(theta)
 
 Grace a ça on peut definir tout les points et crée le polygone
 
-### Affichage d'un polygone régulier de 5 et 10 côtés
+### Affichage d'un polygone régulier de 5 a 8 côtés
 
 ```{r echo=FALSE}
 reg_poly<-function(n, r=1){
@@ -224,10 +231,16 @@ reg_poly<-function(n, r=1){
   
   return(poly)
 }
-par(mfrow=c(1,2),mar=c(4,4,2,2)+0.1)
-dessin_polynome(reg_poly(5, 1))
-dessin_polynome(reg_poly(10, 1))
 ```
+
+```{r echo=FALSE}
+#dessin des polynomes de 5 à 10 côtés
+par(mfrow=c(2,3),mar=c(4,4,2,2)+0.1)
+for (i in 5:10) {
+  dessin_polynome(reg_poly(i))
+}
+```
+
 
 ## 4.2 Polygone surprise
 
@@ -388,7 +401,7 @@ points(points[!pin,1], points[!pin,2], col='darkblue', pch=20)
 
 ## fonction qui calcul l'aire d'un polygone
 
-### qui calcul l'aire de la boite englobante d'un polygone en prenant les coordonnées min et max
+### Qui calcul l'aire de la boite englobante d'un polygone en prenant les coordonnées min et max
 
 ```{r include=FALSE}
 aire<-function(bo){
@@ -449,19 +462,17 @@ cat("Aire du losange avec 10000 points",mc.poly(10000,losange,TRUE))
 
 ### Test avec affichage d'un polygone non regulier
 
-```{r include=FALSE}
+```{r echo=FALSE}
 print(mc.poly(10000, surprise,TRUE))
 ```
 
 # 6 Calcul exact de l'aire d'un polygone simple
 
-## l'aire du losange et du carré est de 1 c'est ce que j'ai obtenu a la main , le resultat est satisfaisant
+l'aire du losange et du carré est de 1 c'est ce que j'ai obtenu a la main , le resultat est satisfaisant
 
-# Aire exacte d'un polygone simple
+Aire exacte d'un polygone simple
 
-### Définir une fonction aire.poly qui prend en argument un polygone et calcule son aire exacte.
-
-### J'aicalculer l'aire du polygone avec la somme des triangles
+J'ai calculer l'aire du polygone avec la somme des triangles
 
 ```{r echo=FALSE}
 aire.poly<-function(polygone){
@@ -555,16 +566,16 @@ lines(10^seq(1,n),erreursurprise,type="l",col="darkviolet")
 
 -   on voit que plus le nombre de points est grand plus l'erreur est petite
 
--   on voit que pour le polygone a 3 cote l'erreur est plus grande que pour le polygone a 10 cote
+-   on voit que pour le polygone a 3 côtés l'erreur est plus grande que pour le polygone a 10 cote
 
--   on voit que pour le polygone a 3 cote l'erreur est plus grande que pour le losange
+-   on voit que pour le polygone a 3 côtés l'erreur est plus grande que pour le losange
 
--   on voit que pour le polygone a 3 cote l'erreur est plus grande que pour le carre
+-   on voit que pour le polygone a 3 côtés l'erreur est plus grande que pour le carre
 
--   on voit que pour le polygone a 3 cote l'erreur est plus grande que pour le surprise
+-   on voit que pour le polygone a 3 côtés l'erreur est plus grande que pour le surprise
 
 -   on voit que pour le carre et le lonsange l'erreur reste constante
 
 # Conclusion:
 
-## on voit que plus le nombre de points est grand plus l'erreur est petite
+on voit que plus le nombre de points est grand plus l'erreur est petite
