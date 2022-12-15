@@ -1,0 +1,570 @@
+---
+title: "Estimation-d-aires-avec-la-methode-de-Monte-Carlo"
+author: "Samy Ben Dhiab"
+date: "2022-12-12"
+output:
+  pdf_document: default
+  html_document: default
+header-includes:
+  - \usepackage{titling}
+  - \predate{\begin{center}\large}
+  - \postdate{\\
+      \includegraphics[width=2in,height=2in]{assets/logo.png}\end{center}}
+---
+
+\newpage
+
+# 2 Méthode de Monte Carlo pour approximer
+
+## Définir une fonction mc.pi qui prend en argument un entier n, et renvoie une valeur approchée de pi, obtenue à l'aide de la méthode de Monte Carlo, et avec n points tirés uniformément au hasard.
+
+```{r include=FALSE}
+mc.pi<-function(n){
+  #point alea
+  x<-runif(n, min = 0, max = 1)
+  y<-runif(n, min = 0, max = 1)
+  R<-1 #rayon du cercle
+  N<-0 #nombre de points dans le cercle
+  for (i in 1:n){
+    if (x[i]^2+y[i]^2<=R^2){N<-N+1} #si le point est dans le cercle
+  }
+  return(4*N/n)
+}
+```
+
+### On test notre mc.pi avec un ordre de grandeur entre 10 et 100 000 000
+
+```{r echo=FALSE}
+testmc.pi<-function(n){
+  s<-1:n
+  s<-10**s
+  res<-sapply(s,mc.pi)
+  return(res)
+}
+
+testmc.pi(8)
+```
+
+## Estimations de Pi
+
+```{r include=FALSE}
+t <- 50
+p <- 7
+PIE <- matrix(0, t, p)
+for (i in 1:t) {
+  for (j in 1:p) {
+    PIE[i, j] <- mc.pi(10**j)
+  }
+}
+```
+
+```{r include=FALSE}
+tE <- vector("numeric", p)
+for (j in 1:p) {
+  tE[j] <- system.time(replicate(t, mc.pi(10**j)))[3]
+}
+tE
+```
+
+```{r include=FALSE}
+ERR <- abs(PIE / pi - 1)
+
+```
+
+### Representation du temps moyen et de l'erreur relative en fonction des 10\^n points
+
+```{r echo=FALSE}
+par(mfrow = c(1, 2), mar = c(4, 4, 2, 2) + 0.1)
+boxplot(ERR, main = 'Erreur relative sur PI', log = 'y', xlab = '#points', ylab = 'Rel. Error')
+plot(10^(1:p), tE, type = 'b', main = 'Temps moyen d\'une simulation', log = 'x', xlab = '#points', ylab = 'Time')
+```
+
+## 2.3 Autres méthodes d'estimation de Pi
+
+### Cette fonction calcul pi grâce au calcul en serie
+
+```{r}
+serie <- function(x){
+  res <- 0
+  for (i in 0:x){
+    res <- res + (4*((-1)**i))/((2*i)+1)
+  }
+  return (res)
+}
+```
+
+### Cette fonction calcul pi grâce au procédé somme infinie
+
+```{r}
+somme_inf <- function(x){
+  res <- 0
+  for (i in 0:x){
+    res <- res+ (((-1)**i)/((2*i)+1))
+  }
+  return(4*res)
+}
+```
+
+### Cette fonction calcul pi grâce à une méthode récursive
+
+```{r}
+math <- function(n){
+  A <- 1
+  B <- 1/(2**(1/2))
+  C <- 1/4
+  for (i in 0:n){
+    A1 <- (A+B)/2 
+    B1 <- (A*B)**(1/2)
+    C1 <- C-(2**i)(((A-B)/2)**2)
+    A <- A1
+    B <- B1
+    C <- c1
+  }  
+  return((((A+B)/2)**2)/C)
+}
+```
+
+### Cette fonction calcul pi grâce à une méthode datant du moyen-âge
+
+```{r}
+histo <- function(n){
+  res <- 0
+  for (i in 0:n){
+    
+    res <- res+(((-1/3)**i)/((2*i)+1))
+  }
+  res <- res*(12**(1/2))
+  return (res)
+}
+```
+
+# Conclusion
+
+### Quelle est la relation entre l'erreur relative et le temps mis pour obtenir une estimation ?
+
+La relation est linéaire, plus le nombre de points est grand, plus le temps de calcul est long et plus l'erreur est petite.
+
+### Quelle est la relation entre l'erreur relative et le nombre de points utilisés pour obtenir une estimation ?
+
+Plus le nombre de points est grand, plus l'erreur est petite.
+
+\newpage
+
+# 3 Polygones dans la suite du TP/projet
+
+```{r include=FALSE}
+creer_polygone <- function (x,y) {
+  matrix(c(x, x[1], y, y[1]), ncol=2,dimnames=list(c(), c("x","y")))
+}
+
+```
+
+```{r}
+carre <- creer_polygone(c(10,10,90,90), c(30, 70, 70, 30))
+```
+
+```{r}
+carre <- creer_polygone(c(10,90,90,10), c(70, 70, 30, 30))
+```
+
+Une permutation cyclique des points donne le même polygone
+
+En revanche, le code suivant ne définit pas un rectangle, mais un polygone dont les arêtes se croisent.
+
+```{r}
+papillon <- creer_polygone(c(10,90,10,90), c(30,70,70,30))
+```
+
+pour finir, voici un losange.
+
+```{r}
+losange <- creer_polygone(c(50,10,50,90),c(30,50,70,50))
+
+```
+
+affiche un plot du carre
+
+```{r echo=FALSE}
+
+
+dessin_polynome<-function(polynome){
+
+    plot(polynome, type="l")
+    lines(polynome, type="l", col="darkblue")
+}
+
+dessin_polynome(carre)
+```
+
+# 4 Génération de polygones
+
+### Tout d'abord on se demande Quelles sont les coordonnées cartésiennes (x,y) d'un point dont les coordonnées polaires sont (r,theta)?
+
+x=r*cos(theta) y=r*sin(theta)
+
+Grace a ça on peut definir tout les points et crée le polygone
+
+### Affichage d'un polygone régulier de 5 et 10 côtés
+
+```{r echo=FALSE}
+reg_poly<-function(n, r=1){
+  
+  angle=2*pi/n
+  
+  poly<-matrix(0,n+1,2)
+  
+  for (i in 1:n) {
+    poly[i,1]<-r*cos(angle*i)
+    poly[i,2]<-r*sin(angle*i)
+  }
+  poly[n+1,1]<-r*cos(angle*1)
+  poly[n+1,2]<-r*sin(angle*1)
+
+
+  
+  return(poly)
+}
+par(mfrow=c(1,2),mar=c(4,4,2,2)+0.1)
+dessin_polynome(reg_poly(5, 1))
+dessin_polynome(reg_poly(10, 1))
+```
+
+## 4.2 Polygone surprise
+
+```{r include=FALSE}
+x <- c(0,0,9,11,11,9,8,11,9,6,3,3,8,9,9,8,2,2)
+y <- c(0,12,12,10,7,5,5,0,0,5,5,7,7,8,9,10,10,0)
+
+```
+
+```{r echo=FALSE}
+surprise <- creer_polygone(x,y)
+plot(surprise,col="black", type="l")
+```
+
+### On remarque que c'est le logo de R
+
+# 5 Approximation de l'aire d'un polygone simple
+
+## 5.1 Tirer un ou plusieurs points uniformément au hasard dans un rectangle
+
+### On a crée une fonction "boite" qui renvoie les xet y minimum et maximum de notre polygones
+
+```{r include=FALSE}
+boite<-function(poly){
+    boite<-matrix(0,2,2)
+    boite[1,1]<-min(poly[,1])
+    boite[1,2]<-min(poly[,2])
+    boite[2,1]<-max(poly[,1])
+    boite[2,2]<-max(poly[,2])
+  return(boite)
+}
+
+```
+
+Resultat obtenue
+
+```{r include=FALSE}
+print(losange)
+bo <- boite(losange)
+print(bo)
+
+```
+
+#### Resultat attendu
+
+losange: x y [1,] 50 30 [2,] 10 50 [3,] 50 70 [4,] 90 50 [5,] 50 30
+
+boite(losange) x y min 10 30 max 90 70
+
+##Tirage de points uniformément aléatoirement dans un rectangle \### fonction qui renvoi n tuple de points dans notre boite
+
+```{r include=FALSE}
+points_aleatoires<-function(n, bo){
+
+  points<-matrix(0,n,2)
+
+  for (i in 1:n) {
+    points[i,1]<-runif(1,bo[1,1],bo[2,1])
+    points[i,2]<-runif(1,bo[1,2],bo[2,2])
+  }
+  return(points)
+}
+bo <- matrix(c(3, 5, 6, 8),nrow=2, dimnames=list(c("min","max"), c("x","y")))
+pts <- points_aleatoires(5, bo)
+
+cat("bo=",bo,"\t","pts=",pts,"\n")
+```
+
+## 5.2 Un point donné est-il à l'intérieur ou à l'extérieur du polygone ?
+
+### Verifier si le point est à l'intérieur du polygone
+
+On va utiliser la methodes du raytracing
+
+Le point est à l'intérieur du polygone si :
+
+1.  le nombre d'intersections de la demi-droite partant du point vers la droite est impair
+
+2.  le x du point est plus grand que le x min du polygone
+
+3.  le x du point est plus petit que le x max du polygone
+
+4.  le y du point est plus grand que le y min du polygone
+
+5.  le y du point est plus petit que le y max du polygone
+
+```{r include=FALSE}
+appartient_poly<-function (point,polygone){
+
+  # Verifier si le point est à l'intérieur du polygone
+  # On va utiliser la methodes du raytracing
+  # Le point est à l'intérieur du polygone si :
+  # le nombre d'intersections de la demi-droite partant du point vers la droite est impair
+  # le x du point est plus grand que le x min du polygone
+  # le x du point est plus petit que le x max du polygone
+  # le y du point est plus grand que le y min du polygone
+  # le y du point est plus petit que le y max du polygone
+  resultat<-FALSE
+  n<-nrow(polygone)
+  for (i in 1:n) {
+    if (i==n) {
+      j<-1
+    } else {
+      j<-i+1
+    }
+    if (point[2]>min(polygone[i,2],polygone[j,2]) && point[2]<=max(polygone[i,2],polygone[j,2])) {
+      if (point[1]<=max(polygone[i,1],polygone[j,1])) {
+        if (polygone[i,2]!=polygone[j,2]) {
+
+          # y = ax+b
+          # x = (y-b)/a
+          # x = (y - y1) * (x2 - x1) / (y2 - y1) + x1
+          # on evalue x pour y=point[2]
+          # x = (point[2] - y1) * (x2 - x1) / (y2 - y1) + x1
+
+          x1<-polygone[i,1]
+          x2<-polygone[j,1]
+          y1<-polygone[i,2]
+          y2<-polygone[j,2]
+          xinters<-((point[2]-y1)*(x2-x1)/(y2-y1)+x1)
+          if (polygone[i,1]==polygone[j,1] || point[1]<=xinters) {
+            resultat<-!resultat
+          }
+        }
+      }
+    }
+  }
+  return  (resultat)
+}
+```
+
+```{r include=FALSE}
+appartient<-function(points,polynome){
+  resultat<-rep(FALSE,nrow(points))
+  for (i in 1:nrow(points)) {
+      resultat[i]<-appartient_poly(points[i,],polynome)
+  }
+  return(resultat)
+}
+```
+
+```{r include=FALSE}
+carre <- creer_polygone(c(0, 0, 1, 1), c(0, 1, 1, 0))
+cc <- seq(from=-0.25,to=1.25,by=0.25)
+points <- do.call(rbind,lapply(cc, FUN=cbind, cc,deparse.level = 0))
+pin <- appartient(points,carre);
+```
+
+### Dessiner le résultat du test
+
+```{r echo=FALSE}
+par(mar=c(2,2,3,2)+0.1)
+plot(carre, type='l', main="Test de la fonction appartient", xlim=range(carre[,1],points[,1]), ylim=range(carre[,2],points[,2]))
+points(points[pin,1], points[pin,2], col='firebrick', pch=20)
+points(points[!pin,1], points[!pin,2], col='darkblue', pch=20)
+
+```
+
+## fonction qui calcul l'aire d'un polygone
+
+### qui calcul l'aire de la boite englobante d'un polygone en prenant les coordonnées min et max
+
+```{r include=FALSE}
+aire<-function(bo){
+  diffx<-bo[2,1]-bo[1,1]
+  diffy<-bo[2,2]-bo[1,2]
+  aire<-diffx*diffy
+  return(abs(aire))
+}
+
+```
+
+```{r include=FALSE}
+dessin_points<-function(points,pin){
+  #dessiner les points
+  #si le point est in le point est rouge
+  if (pin) { points(points[,1], points[,2], col='firebrick', pch=20)
+  }
+  #sinon le point est bleu
+  else { points(points[,1], points[,2], col='darkblue', pch=20)}
+}
+```
+
+Définir une fonction mc.poly qui prend en argument un entier n correspondant au nombre de points à tirer au hasard et un polygone, et qui renvoie une valeur approchée de l'aire du polygone par la méthode de Monte Carlo.
+
+```{r}
+mc.poly<-function(n,polygone,DRAW=FALSE){
+  #faire un carre de taille max des dimensions du polygone
+  bo<-boite(polygone)
+  #tirer n points aleatoires
+  pts <- points_aleatoires(n, bo)
+  #calculer le nombre de points dans le polygone
+  nbpts<-sum(appartient(pts,polygone))
+  #portion de points dans le polygone
+  p<-nbpts/n
+  if(DRAW){
+    #dessine le polygone et les points
+    dessin_polynome(polygone)
+    #points dans le polygone
+    dessin_points(pts[appartient(pts,polygone),],TRUE)
+    #points hors du polygone
+    dessin_points(pts[!appartient(pts,polygone),],FALSE)
+  }
+
+  return(p*aire(bo))
+}
+
+
+```
+
+```{r echo=FALSE}
+par(mfrow=c(2,2))
+cat("approximation de l'aire du polygone par la methode de Monte Carlo")
+cat("Aire du losange avec 10 points",mc.poly(10,losange,TRUE))
+cat("Aire du losange avec 100 points",mc.poly(100,losange,TRUE))
+cat("Aire du losange avec 1000 points",mc.poly(1000,losange,TRUE))
+cat("Aire du losange avec 10000 points",mc.poly(10000,losange,TRUE))
+```
+
+### Test avec affichage d'un polygone non regulier
+
+```{r include=FALSE}
+print(mc.poly(10000, surprise,TRUE))
+```
+
+# 6 Calcul exact de l'aire d'un polygone simple
+
+## l'aire du losange et du carré est de 1 c'est ce que j'ai obtenu a la main , le resultat est satisfaisant
+
+# Aire exacte d'un polygone simple
+
+### Définir une fonction aire.poly qui prend en argument un polygone et calcule son aire exacte.
+
+### J'aicalculer l'aire du polygone avec la somme des triangles
+
+```{r echo=FALSE}
+aire.poly<-function(polygone){
+    
+    aire<-0
+    for (i in 1:(nrow(polygone)-1)) {
+      aire<-aire+(polygone[i+1,1]+polygone[i,1])*(polygone[i+1,2]-polygone[i,2])
+    }
+
+
+  aire<-abs(aire/2)
+  return(aire)
+
+}
+
+cat(aire.poly(surprise),"\n")#-71
+cat(mc.poly(5000,surprise),"\n")
+
+```
+
+# 7 Simulations : aire approchée versus aire exacte
+
+-   J'ai utilisé les fonctions créer les polygones et les points aleatoires
+
+-   un polygones a 3 cote et un autre a 10 cote
+
+-   j'ai calculé l'aire exacte de chaque polygone
+
+-   j'ai calculé l'aire approchée en fonction du nombre de points
+
+-   j'ai calculé l'erreur en fonction du nombre de points
+
+```{r include=FALSE}
+poly3<-reg_poly(3,1)
+```
+
+```{r include=FALSE}
+poly10<-reg_poly(10,1)
+```
+
+```{r include=FALSE}
+aire3<-aire.poly(poly3)
+aire10<-aire.poly(poly10)
+airelosange<-aire.poly(losange)
+airecarre<-aire.poly(carre)
+airesurprise<-aire.poly(surprise)
+
+```
+
+```{r include=FALSE}
+n<-5 #10 puissance cmb de points
+nrep<-5 #nombre de simulation
+aire3mc<-numeric(n)
+aire10mc<-numeric(n)
+airelosangemc<-numeric(n)
+airecarremc<-numeric(n)
+airesurprisemc<-numeric(n)
+
+for (i in 1:n){
+  aire3mc[i]<-mean(replicate(nrep,mc.poly(10^i,poly3)))
+  aire10mc[i]<-mean(replicate(nrep,mc.poly(10^i,poly10)))
+  airelosangemc[i]<-mean(replicate(nrep,mc.poly(10^i,losange)))
+  airecarremc[i]<-mean(replicate(nrep,mc.poly(10^i,carre)))
+  airesurprisemc[i]<-mean(replicate(nrep,mc.poly(10^i,surprise)))
+
+}
+```
+
+```{r include=FALSE}
+erreur3<-abs(aire3-aire3mc)
+erreur10<-abs(aire10-aire10mc)
+erreurlosange<-abs(airelosange-airelosangemc)
+erreurcarre<-abs(airecarre-airecarremc)
+erreursurprise<-abs(airesurprise-airesurprisemc)
+
+```
+
+```{r echo=FALSE}
+
+plot(10^seq(1,n),erreur3,type="l",col="darkblue",xlab="Nombre de points",ylab="Erreur",main="Erreur en fonction du nombre de points")
+legend("top",legend=c("polygone a 3 cote","polygone a 10 cote","losange","carre","surprise"),col=c("darkblue","firebrick","darkgreen","darkorange","darkviolet"),lty=1)
+par(new=TRUE)
+lines(10^seq(1,n),erreur10,type="l",col="firebrick")
+par(new=TRUE)
+lines(10^seq(1,n),erreurlosange,type="l",col="darkgreen")
+par(new=TRUE)
+lines(10^seq(1,n),erreurcarre,type="l",col="darkorange")
+par(new=TRUE)
+lines(10^seq(1,n),erreursurprise,type="l",col="darkviolet")
+```
+
+-   on voit que plus le nombre de points est grand plus l'erreur est petite
+
+-   on voit que pour le polygone a 3 cote l'erreur est plus grande que pour le polygone a 10 cote
+
+-   on voit que pour le polygone a 3 cote l'erreur est plus grande que pour le losange
+
+-   on voit que pour le polygone a 3 cote l'erreur est plus grande que pour le carre
+
+-   on voit que pour le polygone a 3 cote l'erreur est plus grande que pour le surprise
+
+-   on voit que pour le carre et le lonsange l'erreur reste constante
+
+# Conclusion:
+
+## on voit que plus le nombre de points est grand plus l'erreur est petite
